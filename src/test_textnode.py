@@ -44,6 +44,84 @@ class TestTextNode(unittest.TestCase):
         new_nodes = TextNode.split_nodes_delimiter([node], "*", "italic")
         new_nodes_test = [TextNode("Italic word", "italic")]
         self.assertEqual(new_nodes, new_nodes_test)
-        
+    
+    def test_extract_markdown_images(self):
+        text = "This is a text with ![image](https://www.google.com)"
+        images = TextNode.extract_markdown_images(text)
+        images_test = [('image', 'https://www.google.com')]
+        self.assertEqual(images, images_test)
+    
+    def test_extract_markdown_images_multiple(self):
+        text = "This is a text with ![image](https://www.google.com) and ![image2](https://www.google.com)"
+        images = TextNode.extract_markdown_images(text)
+        images_test = [('image', 'https://www.google.com'), ('image2', 'https://www.google.com')]
+        self.assertEqual(images, images_test)
+
+    def test_extract_markdown_images_no_images(self):
+        text = "This is a text with no images"
+        images = TextNode.extract_markdown_images(text)
+        images_test = []
+        self.assertEqual(images, images_test)
+    
+    def test_extract_markdown_links(self):
+        text = "This is a text with [link](https://www.google.com)"
+        links = TextNode.extract_markdown_links(text)
+        links_test = [('link', 'https://www.google.com')]
+        self.assertEqual(links, links_test)
+    
+    def test_extract_markdown_links_multiple(self):
+        text = "This is a text with [link](https://www.google.com) and [link2](https://www.google.com)"
+        links = TextNode.extract_markdown_links(text)
+        links_test = [('link', 'https://www.google.com'), ('link2', 'https://www.google.com')]
+        self.assertEqual(links, links_test)
+    
+    def test_extract_markdown_links_no_links(self):
+        text = "This is a text with no links"
+        links = TextNode.extract_markdown_links(text)
+        links_test = []
+        self.assertEqual(links, links_test)
+
+    def test_split_nodes_image(self):
+        node = TextNode(
+            "This is text with an ![image](https://i.imgur.com/zjjcJKZ.png) and another ![second image](https://i.imgur.com/3elNhQu.png)",
+            "text",
+        )
+        new_nodes = TextNode.split_nodes_image([node])
+
+        new_nodes_test = [
+            TextNode("This is text with an ", "text"),
+            TextNode("image", "image", "https://i.imgur.com/zjjcJKZ.png"),
+            TextNode(" and another ", "text"),
+            TextNode(
+                "second image", "image", "https://i.imgur.com/3elNhQu.png"
+            ),
+        ]
+        self.assertEqual(new_nodes, new_nodes_test)
+
+    def test_split_nodes_image_no_images(self):
+        node = TextNode("This is text with no images", "text")
+        new_nodes = TextNode.split_nodes_image([node])
+        new_nodes_test = [TextNode("This is text with no images", "text")]
+        self.assertEqual(new_nodes, new_nodes_test)
+
+    def test_split_nodes_link(self):
+        node = TextNode(
+            "This is text with a [link](https://www.google.com) and another [second link](https://www.google.com)",
+            "text",
+        )
+        new_nodes = TextNode.split_nodes_link([node])
+
+        new_nodes_test = [
+            TextNode("This is text with a ", "text"),
+            TextNode("link", "link", "https://www.google.com"),
+            TextNode(" and another ", "text"),
+            TextNode(
+                "second link", "link", "https://www.google.com"
+            ),
+        ]
+        self.assertEqual(new_nodes, new_nodes_test)
+
+
+
 if __name__ == "__main__":
     unittest.main()
