@@ -1,8 +1,14 @@
 import unittest
 
 from textnode import TextNode
-from htmlnode import LeafNode
+from htmlnode import LeafNode, ParentNode
 
+text_type_text = "text"
+text_type_bold = "bold"
+text_type_italic = "italic"
+text_type_code = "code"
+text_type_link = "link"
+text_type_image = "image"
 class TestTextNode(unittest.TestCase):
     def test_eq(self):
         node = TextNode("This is a text node", "bold")
@@ -121,7 +127,45 @@ class TestTextNode(unittest.TestCase):
         ]
         self.assertEqual(new_nodes, new_nodes_test)
 
+    def test_text_to_text_nodes(self):
+        text = "This is **text** with an *italic* word and a `code block` and an ![image](https://i.imgur.com/zjjcJKZ.png) and a [link](https://boot.dev)"
+        nodes = TextNode.text_to_text_nodes(text)
+        nodes_test = [
+            TextNode("This is ", text_type_text),
+            TextNode("text", text_type_bold),
+            TextNode(" with an ", text_type_text),
+            TextNode("italic", text_type_italic),
+            TextNode(" word and a ", text_type_text),
+            TextNode("code block", text_type_code),
+            TextNode(" and an ", text_type_text),
+            TextNode("image", text_type_image, "https://i.imgur.com/zjjcJKZ.png"),
+            TextNode(" and a ", text_type_text),
+            TextNode("link", text_type_link, "https://boot.dev"),
+        ]
 
+        self.assertEqual(nodes, nodes_test)
+
+    def test_markdown_to_blocks(self):
+        markdown = "   This is a markdown\n\nblock"
+        blocks = TextNode.markdown_to_blocks(markdown)
+        blocks_test = ["This is a markdown", "block"]
+        self.assertEqual(blocks, blocks_test)
+
+    def test_markdown_to_blocks_empty(self):
+        markdown = f"This is **bolded** paragraph\n\nThis is another paragraph with *italic* text and `code` here\nThis is the same paragraph on a new line\n\n* This is a list\n* with items\n"
+        blocks = TextNode.markdown_to_blocks(markdown)
+        blocks_test = [
+            "This is **bolded** paragraph",
+            "This is another paragraph with *italic* text and `code` here\nThis is the same paragraph on a new line",
+            "* This is a list\n* with items",
+        ]
+        self.assertEqual(blocks, blocks_test)
+
+    def test_markdown_to_html_node(self):
+        markdown = "This is **bolded** paragraph\n\n# heading 1\n\n## heading 2 with **bold**\n\nThis is another paragraph with *italic* text and `code` here\nThis is the same paragraph on a new line\n\n* This is a list\n* with items\n\n```This is a code block```\n\n> This is a blockquote with [link](https://boot.dev) and an ![image](https://i.imgur.com/zjjcJKZ.png\n\n* This is a task\n* This is a completed task\n\n1. This is a numbered list\n2. with items\n\nThis is a paragraph with a [link](https://boot.dev) and an ![image](https://i.imgur.com/zjjcJKZ.png)"
+        nodes = TextNode.markdown_to_html_node(markdown)
+       
+        # self.assertEqual(nodes, nodes_test)
 
 if __name__ == "__main__":
     unittest.main()
