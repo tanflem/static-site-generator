@@ -206,42 +206,22 @@ class TextNode:
         return ParentNode(tag = "ol", children = html_nodes)
     
     def markdown_to_html_node(markdown):
-        print("\n")
         blocks = TextNode.markdown_to_blocks(markdown)
-        print(blocks)
         block_with_type = [(block, TextNode.block_to_block_type(block)) for block in blocks]
-        print()
-        print(block_with_type)
-        print()
         html_nodes = []
         for block, block_type in block_with_type:
-            print(block_type)
-            print(block)
-            print()
             if block_type == BLOCK_TYPE_HEADING:
-                print(TextNode.block_type_heading_to_html_node(block).to_html())
-                print()
                 html_nodes.append(TextNode.block_type_heading_to_html_node(block))
             elif block_type == BLOCK_TYPE_CODE:
-                print(TextNode.block_type_code_to_html_node(block).to_html())
-                print()
                 html_nodes.append(TextNode.block_type_code_to_html_node(block))
             elif block_type == BLOCK_TYPE_QUOTE:
-                print(TextNode.block_type_quote_to_html_node(block).to_html())
-                print()
                 html_nodes.append(TextNode.block_type_quote_to_html_node(block))
             elif block_type == BLOCK_TYPE_UNORDERED_LIST:
-                print(TextNode.block_type_unordered_list_to_html_node(block).to_html())
-                print()
                 html_nodes.append(TextNode.block_type_unordered_list_to_html_node(block))
             elif block_type == BLOCK_TYPE_ORDERED_LIST:
-                print(TextNode.block_type_ordered_list_to_html_node(block).to_html())
-                print()
                 html_nodes.append(TextNode.block_type_ordered_list_to_html_node(block))
             else:
-                print(TextNode.block_type_paragraph_to_html_node(block).to_html())
-                print()
                 html_nodes.append(TextNode.block_type_paragraph_to_html_node(block))
         
         parent_div = ParentNode(tag = "div", children=html_nodes)
-        print(parent_div.to_html())
+        return parent_div
